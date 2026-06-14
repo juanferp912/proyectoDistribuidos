@@ -1,0 +1,7 @@
+# Ignorar archivo de credenciales locales
+.env
+
+# Ignorar carpetas de datos locales si se generan
+.n8n/
+pgdata/
+*.log

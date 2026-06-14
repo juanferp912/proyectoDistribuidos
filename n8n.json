@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ce5a1251-7208-46e7-8581-31e059016506",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT nombre_insumo, cantidad_stock, punto_reorden, proveedor_ref \nFROM materia_prima \nWHERE cantidad_stock <= punto_reorden;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ba0394b6-5f45-470f-bd24-740604dcdd58",
+      "name": "Alerta Inteligente de Bajo Stock",
+      "credentials": {
+        "postgres": {
+          "id": "FeXCCUJw8Wt0RqBr",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT nombre_insumo, (cantidad_stock * precio_unitario) as capital_invertido \nFROM materia_prima \nORDER BY capital_invertido DESC \nLIMIT 5;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5f0dd444-ebde-48b3-b4e9-9744b12c2bf4",
+      "name": "Análisis Financiero",
+      "credentials": {
+        "postgres": {
+          "id": "FeXCCUJw8Wt0RqBr",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    COUNT(*) as total_skus, \n    SUM(cantidad_stock * precio_unitario) as valor_total_bodega,\n    COUNT(CASE WHEN fecha_caducidad <= CURRENT_DATE + INTERVAL '3 days' THEN 1 END) as productos_por_caducar\nFROM materia_prima;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        624,
+        0
+      ],
+      "id": "fcf82ccf-51c8-4642-8565-d1177a401f06",
+      "name": "Resumen Gerencial y Control de Mermas",
+      "credentials": {
+        "postgres": {
+          "id": "FeXCCUJw8Wt0RqBr",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Alerta Inteligente de Bajo Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alerta Inteligente de Bajo Stock": {
+      "main": [
+        [
+          {
+            "node": "Análisis Financiero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Análisis Financiero": {
+      "main": [
+        [
+          {
+            "node": "Resumen Gerencial y Control de Mermas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "92d29f7705171fc6d79187cd1b7c518e13675cbcbfdf0a4bbb03c7ddf00c7fac"
+  }
+}
