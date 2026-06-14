@@ -5,10 +5,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -96,
-        48
+        -192,
+        240
       ],
-      "id": "dbd9f575-4f00-4961-91f1-9f3158d5b5ac",
+      "id": "189935d3-77e6-4560-8f21-8683ef7d1ff7",
       "name": "When clicking ‘Execute workflow’"
     },
     {
@@ -20,11 +20,17 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        112,
-        48
+        96,
+        80
       ],
-      "id": "094194bf-734d-4e81-8301-dcd2f1ae11d3",
-      "name": "Alerta Inteligente de Bajo Stock"
+      "id": "55186231-ef28-4b29-be56-dbe94197eac3",
+      "name": "Alerta Inteligente de Bajo Stock",
+      "credentials": {
+        "postgres": {
+          "id": "u8KpXG7I8V6ZOMTV",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -35,11 +41,17 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        320,
-        48
+        96,
+        240
       ],
-      "id": "b8350659-3297-4252-826a-2276703fae8e",
-      "name": "Análisis Financiero"
+      "id": "a9d3ca70-e7c4-4e9f-b07f-16767cffe43d",
+      "name": "Análisis Financiero",
+      "credentials": {
+        "postgres": {
+          "id": "u8KpXG7I8V6ZOMTV",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -50,11 +62,17 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        528,
-        48
+        96,
+        400
       ],
-      "id": "65e303f6-7616-40e6-b61a-fd4c195de6e6",
-      "name": "Resumen Gerencial y Control de Mermas"
+      "id": "41eff4f9-b796-4179-9ecc-23f73c1a22a6",
+      "name": "Resumen Gerencial y Control de Mermas",
+      "credentials": {
+        "postgres": {
+          "id": "u8KpXG7I8V6ZOMTV",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "connections": {
@@ -65,24 +83,12 @@
             "node": "Alerta Inteligente de Bajo Stock",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Alerta Inteligente de Bajo Stock": {
-      "main": [
-        [
+          },
           {
             "node": "Análisis Financiero",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Análisis Financiero": {
-      "main": [
-        [
+          },
           {
             "node": "Resumen Gerencial y Control de Mermas",
             "type": "main",
@@ -90,10 +96,21 @@
           }
         ]
       ]
+    },
+    "Alerta Inteligente de Bajo Stock": {
+      "main": [
+        []
+      ]
+    },
+    "Análisis Financiero": {
+      "main": [
+        []
+      ]
     }
   },
   "pinData": {},
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "92d29f7705171fc6d79187cd1b7c518e13675cbcbfdf0a4bbb03c7ddf00c7fac"
   }
 }
