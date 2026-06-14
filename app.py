@@ -26,7 +26,7 @@ try:
     # ---------------------------------------------------------
     query_resumen = """
     SELECT 
-        COUNT(*) as total_skus, 
+        COUNT(id) as total_skus, 
         SUM(cantidad_stock * precio_unitario) as valor_total_bodega,
         COUNT(CASE WHEN fecha_caducidad <= CURRENT_DATE + INTERVAL '3 days' THEN 1 END) as productos_por_caducar
     FROM materia_prima;
@@ -43,7 +43,7 @@ try:
         if por_caducar > 0:
             st.metric(label="🚨 Alerta: Productos por Caducar (3 días)", value=por_caducar, delta="- Riesgo Merma", delta_color="inverse")
         else:
-            st.metric(label="Productos por Caducar (3 días)", value=por_caducar)
+            st.metric(label="Productos por Caducar (3 days)", value=por_caducar)
 
     st.markdown("---")
     
@@ -52,13 +52,18 @@ try:
     
     with col_izq:
         # ---------------------------------------------------------
-        # REPORTE 1: ALERTA INTELIGENTE DE BAJO STOCK
+        # REPORTE 1: ALERTA INTELIGENTE DE BAJO STOCK (CON JOIN)
         # ---------------------------------------------------------
         st.subheader("🚨 Alerta de Reorden de Stock")
         query_stock = """
-        SELECT nombre_insumo as "Insumo", cantidad_stock as "Stock Actual", punto_reorden as "Mínimo", proveedor_ref as "Proveedor" 
-        FROM materia_prima 
-        WHERE cantidad_stock <= punto_reorden;
+        SELECT 
+            mp.nombre_insumo as "Insumo", 
+            mp.cantidad_stock as "Stock Actual", 
+            mp.punto_reorden as "Mínimo", 
+            COALESCE(p.nombre_empresa, 'Producción Interna') as "Proveedor" 
+        FROM materia_prima mp
+        LEFT JOIN proveedores p ON mp.proveedor_id = p.id
+        WHERE mp.cantidad_stock <= mp.punto_reorden;
         """
         df_stock = pd.read_sql(query_stock, conn)
         if not df_stock.empty:
@@ -68,12 +73,14 @@ try:
             
     with col_der:
         # ---------------------------------------------------------
-        # REPORTE 2: ANÁLISIS FINANCIERO (TOP 5)
+        # REPORTE 2: ANÁLISIS FINANCIERO (TOP 5 CON JOIN)
         # ---------------------------------------------------------
         st.subheader("💰 Top 5 Insumos - Mayor Capital Inmovilizado")
         query_finanzas = """
-        SELECT nombre_insumo, (cantidad_stock * precio_unitario) as capital_invertido 
-        FROM materia_prima 
+        SELECT 
+            mp.nombre_insumo, 
+            (mp.cantidad_stock * mp.precio_unitario) as capital_invertido 
+        FROM materia_prima mp
         ORDER BY capital_invertido DESC 
         LIMIT 5;
         """
