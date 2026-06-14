@@ -4,12 +4,10 @@ import psycopg2
 import pandas as pd
 import os
 
-# Configuración de la página
 st.set_page_config(page_title="La Bolonería - Dashboard", page_icon="📊", layout="wide")
 st.title("📊 Sistema Analítico - La Bolonería")
 st.markdown("---")
 
-# Conexión a la Base de Datos usando las variables de entorno de Docker
 def conectar_db():
     return psycopg2.connect(
         host="postgres_boloneria",
@@ -21,15 +19,12 @@ def conectar_db():
 try:
     conn = conectar_db()
     
-    # ---------------------------------------------------------
-    # REPORTE 3: RESUMEN GERENCIAL (Métricas principales)
-    # ---------------------------------------------------------
+    # REPORTE 3: RESUMEN GERENCIAL
     query_resumen = """
     SELECT 
-        COUNT(id) as total_skus, 
-        SUM(cantidad_stock * precio_unitario) as valor_total_bodega,
-        COUNT(CASE WHEN fecha_caducidad <= CURRENT_DATE + INTERVAL '3 days' THEN 1 END) as productos_por_caducar
-    FROM materia_prima;
+        (SELECT COUNT(*) FROM materia_prima) AS total_skus,
+        (SELECT SUM(stock_actual * costo_unitario) FROM materia_prima) AS valor_total_bodega,
+        (SELECT COUNT(*) FROM productos_menu) AS total_platos_menu;
     """
     df_resumen = pd.read_sql(query_resumen, conn)
     
@@ -39,31 +34,19 @@ try:
     with col2:
         st.metric(label="Valorización Total de Bodega", value=f"${df_resumen['valor_total_bodega'].iloc[0]:,.2f}")
     with col3:
-        por_caducar = int(df_resumen['productos_por_caducar'].iloc[0])
-        if por_caducar > 0:
-            st.metric(label="🚨 Alerta: Productos por Caducar (3 días)", value=por_caducar, delta="- Riesgo Merma", delta_color="inverse")
-        else:
-            st.metric(label="Productos por Caducar (3 days)", value=por_caducar)
+        st.metric(label="Platos Activos en el Menú", value=int(df_resumen['total_platos_menu'].iloc[0]))
 
     st.markdown("---")
     
-    # Secciones en paralelo (Izquierda: Alertas de Stock | Derecha: Top Inversión)
     col_izq, col_der = st.columns(2)
     
     with col_izq:
-        # ---------------------------------------------------------
-        # REPORTE 1: ALERTA INTELIGENTE DE BAJO STOCK (CON JOIN)
-        # ---------------------------------------------------------
+        # REPORTE 1: ALERTA INTELIGENTE (Consultas simplificadas)
         st.subheader("🚨 Alerta de Reorden de Stock")
         query_stock = """
-        SELECT 
-            mp.nombre_insumo as "Insumo", 
-            mp.cantidad_stock as "Stock Actual", 
-            mp.punto_reorden as "Mínimo", 
-            COALESCE(p.nombre_empresa, 'Producción Interna') as "Proveedor" 
-        FROM materia_prima mp
-        LEFT JOIN proveedores p ON mp.proveedor_id = p.id
-        WHERE mp.cantidad_stock <= mp.punto_reorden;
+        SELECT nombre_insumo as "Insumo", stock_actual as "Stock Actual", punto_reorden as "Mínimo", proveedor as "Proveedor" 
+        FROM materia_prima 
+        WHERE stock_actual <= punto_reorden;
         """
         df_stock = pd.read_sql(query_stock, conn)
         if not df_stock.empty:
@@ -72,15 +55,11 @@ try:
             st.success("✅ Todos los insumos tienen stock saludable.")
             
     with col_der:
-        # ---------------------------------------------------------
-        # REPORTE 2: ANÁLISIS FINANCIERO (TOP 5 CON JOIN)
-        # ---------------------------------------------------------
+        # REPORTE 2: ANÁLISIS FINANCIERO
         st.subheader("💰 Top 5 Insumos - Mayor Capital Inmovilizado")
         query_finanzas = """
-        SELECT 
-            mp.nombre_insumo, 
-            (mp.cantidad_stock * mp.precio_unitario) as capital_invertido 
-        FROM materia_prima mp
+        SELECT nombre_insumo, (stock_actual * costo_unitario) as capital_invertido 
+        FROM materia_prima 
         ORDER BY capital_invertido DESC 
         LIMIT 5;
         """

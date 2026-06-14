@@ -5,25 +5,25 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -192,
-        240
+        160,
+        688
       ],
-      "id": "189935d3-77e6-4560-8f21-8683ef7d1ff7",
+      "id": "20685589-660b-49e9-ac9c-2bf2cdb914a9",
       "name": "When clicking ‘Execute workflow’"
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n    mp.nombre_insumo, \n    mp.cantidad_stock, \n    mp.punto_reorden, \n    p.nombre_empresa AS proveedor,\n    p.telefono AS contacto_proveedor\nFROM materia_prima mp\nLEFT JOIN proveedores p ON mp.proveedor_id = p.id\nWHERE mp.cantidad_stock <= mp.punto_reorden;",
+        "query": "SELECT nombre_insumo, stock_actual, punto_reorden, proveedor \nFROM materia_prima \nWHERE stock_actual <= punto_reorden;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        96,
-        80
+        448,
+        544
       ],
-      "id": "55186231-ef28-4b29-be56-dbe94197eac3",
+      "id": "90b09cca-55e5-4533-81bd-144d3b5a013f",
       "name": "Alerta Inteligente de Bajo Stock",
       "credentials": {
         "postgres": {
@@ -35,16 +35,16 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n    mp.nombre_insumo, \n    c.nombre AS categoria,\n    (mp.cantidad_stock * mp.precio_unitario) AS capital_invertido \nFROM materia_prima mp\nJOIN categorias c ON mp.categoria_id = c.id\nORDER BY capital_invertido DESC \nLIMIT 5;",
+        "query": "SELECT nombre_insumo, categoria, (stock_actual * costo_unitario) AS capital_invertido \nFROM materia_prima \nORDER BY capital_invertido DESC \nLIMIT 5;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        96,
-        240
+        448,
+        688
       ],
-      "id": "a9d3ca70-e7c4-4e9f-b07f-16767cffe43d",
+      "id": "b6b69670-453f-4c0a-a418-4e27152569b3",
       "name": "Análisis Financiero",
       "credentials": {
         "postgres": {
@@ -56,16 +56,16 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n    COUNT(id) AS total_skus, \n    SUM(cantidad_stock * precio_unitario) AS valor_total_bodega,\n    COUNT(CASE WHEN fecha_caducidad <= CURRENT_DATE + INTERVAL '3 days' THEN 1 END) AS productos_por_caducar\nFROM materia_prima;",
+        "query": "SELECT \n    (SELECT COUNT(*) FROM materia_prima) AS total_skus,\n    (SELECT SUM(stock_actual * costo_unitario) FROM materia_prima) AS valor_total_bodega,\n    (SELECT COUNT(*) FROM productos_menu) AS total_platos_menu;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        96,
-        400
+        448,
+        832
       ],
-      "id": "41eff4f9-b796-4179-9ecc-23f73c1a22a6",
+      "id": "f63a3481-602e-4cfe-9f73-153eb0c68e55",
       "name": "Resumen Gerencial y Control de Mermas",
       "credentials": {
         "postgres": {
@@ -95,16 +95,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Alerta Inteligente de Bajo Stock": {
-      "main": [
-        []
-      ]
-    },
-    "Análisis Financiero": {
-      "main": [
-        []
       ]
     }
   },
