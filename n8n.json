@@ -1,30 +1,25 @@
 {
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "path": "alertas",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [
-        160,
-        688
-      ],
-      "id": "20685589-660b-49e9-ac9c-2bf2cdb914a9",
-      "name": "When clicking ‘Execute workflow’"
+      "position": [0, 0],
+      "name": "API Alertas de Stock"
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT nombre_insumo, stock_actual, punto_reorden, proveedor \nFROM materia_prima \nWHERE stock_actual <= punto_reorden;",
-        "options": {}
+        "query": "SELECT nombre_insumo, stock_actual, punto_reorden, proveedor FROM materia_prima WHERE stock_actual <= punto_reorden;"
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        448,
-        544
-      ],
-      "id": "90b09cca-55e5-4533-81bd-144d3b5a013f",
-      "name": "Alerta Inteligente de Bajo Stock",
+      "position": [250, 0],
+      "name": "DB Alertas",
       "credentials": {
         "postgres": {
           "id": "u8KpXG7I8V6ZOMTV",
@@ -34,18 +29,24 @@
     },
     {
       "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT nombre_insumo, categoria, (stock_actual * costo_unitario) AS capital_invertido \nFROM materia_prima \nORDER BY capital_invertido DESC \nLIMIT 5;",
+        "path": "top5",
+        "responseMode": "lastNode",
         "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 200],
+      "name": "API Top Finanzas"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT nombre_insumo, categoria, (stock_actual * costo_unitario) AS capital_invertido FROM materia_prima ORDER BY capital_invertido DESC LIMIT 5;"
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        448,
-        688
-      ],
-      "id": "b6b69670-453f-4c0a-a418-4e27152569b3",
-      "name": "Análisis Financiero",
+      "position": [250, 200],
+      "name": "DB Top 5",
       "credentials": {
         "postgres": {
           "id": "u8KpXG7I8V6ZOMTV",
@@ -55,18 +56,24 @@
     },
     {
       "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT \n    (SELECT COUNT(*) FROM materia_prima) AS total_skus,\n    (SELECT SUM(stock_actual * costo_unitario) FROM materia_prima) AS valor_total_bodega,\n    (SELECT COUNT(*) FROM productos_menu) AS total_platos_menu;",
+        "path": "resumen",
+        "responseMode": "lastNode",
         "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 400],
+      "name": "API Resumen Gerencial"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT (SELECT COUNT(*) FROM materia_prima) AS total_skus, (SELECT SUM(stock_actual * costo_unitario) FROM materia_prima) AS valor_total_bodega, (SELECT COUNT(*) FROM productos_menu) AS total_platos_menu;"
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        448,
-        832
-      ],
-      "id": "f63a3481-602e-4cfe-9f73-153eb0c68e55",
-      "name": "Resumen Gerencial y Control de Mermas",
+      "position": [250, 400],
+      "name": "DB Resumen",
       "credentials": {
         "postgres": {
           "id": "u8KpXG7I8V6ZOMTV",
@@ -76,31 +83,38 @@
     }
   ],
   "connections": {
-    "When clicking ‘Execute workflow’": {
+    "API Alertas de Stock": {
       "main": [
         [
           {
-            "node": "Alerta Inteligente de Bajo Stock",
+            "node": "DB Alertas",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "API Top Finanzas": {
+      "main": [
+        [
           {
-            "node": "Análisis Financiero",
+            "node": "DB Top 5",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "API Resumen Gerencial": {
+      "main": [
+        [
           {
-            "node": "Resumen Gerencial y Control de Mermas",
+            "node": "DB Resumen",
             "type": "main",
             "index": 0
           }
         ]
       ]
     }
-  },
-  "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "92d29f7705171fc6d79187cd1b7c518e13675cbcbfdf0a4bbb03c7ddf00c7fac"
   }
 }

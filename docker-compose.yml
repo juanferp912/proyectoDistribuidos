@@ -34,26 +34,6 @@ services:
     depends_on:
       - postgres_boloneria
 
-  # 3. CONTENEDOR DEL DASHBOARD (STREAMLIT)
-  streamlit_dashboard:
-    image: python:3.10-slim
-    container_name: streamlit_boloneria
-    restart: always
-    ports:
-      - "8501:8501"
-    environment:
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-    volumes:
-      - .:/app
-    working_dir: /app
-    command: >
-      sh -c "pip install streamlit psycopg2-binary pandas && streamlit run app.py --server.port=8501 --server.address=0.0.0.0"
-    networks:
-      - red_bodega
-    depends_on:
-      - postgres_boloneria
 
 # VOLÚMENES PERSISTENTES
 volumes:
