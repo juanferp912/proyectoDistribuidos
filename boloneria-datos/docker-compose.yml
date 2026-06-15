@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata_boloneria:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d/
     networks:
       - red_bodega
@@ -27,9 +27,6 @@ services:
       - N8N_PORT=5678
       - GENERIC_TIMEZONE=America/Guayaquil
       - N8N_ENCRYPTION_KEY=${N8N_KEY:-proyectodistribuidos2026}
-      - N8N_INSTANCE_OWNER_MANAGED_BY_ENV=true
-      - N8N_INSTANCE_OWNER_EMAIL=${N8N_OWNER_EMAIL}
-      - N8N_INSTANCE_OWNER_PASSWORD_HASH=${N8N_OWNER_PASSWORD}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
     volumes:
       - ./n8n_data:/home/node/.n8n
@@ -41,7 +38,6 @@ services:
 
 # VOLÚMENES PERSISTENTES
 volumes:
-  pgdata_boloneria:
   n8n_data:
 
 # REDES INTERNAS

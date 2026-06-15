@@ -12,3 +12,8 @@ n8n_data/*.sqlite-wal
 n8n_data/crash.journal
 n8n_data/**/*.log
 n8n_data/*.log
+
+node_modules/
+
+# Ignorar datos binarios de Postgres para no subirlos a Github
+postgres_data/
