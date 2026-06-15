@@ -29,7 +29,7 @@ services:
       - N8N_ENCRYPTION_KEY=${N8N_KEY:-proyectodistribuidos2026}
       - N8N_INSTANCE_OWNER_MANAGED_BY_ENV=true
       - N8N_INSTANCE_OWNER_EMAIL=${N8N_OWNER_EMAIL}
-      - N8N_INSTANCE_OWNER_PASSWORD=${N8N_OWNER_PASSWORD}
+      - N8N_INSTANCE_OWNER_PASSWORD_HASH=${N8N_OWNER_PASSWORD}
     volumes:
       - ./n8n_data:/home/node/.n8n
     networks:
