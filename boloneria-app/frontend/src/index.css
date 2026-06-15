@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "boloneria";
+  default: true;
+
+  --color-primary: oklch(0.47 0.17 148.35);
+  --color-primary-content: oklch(0.98 0.01 148);
+
+  --color-secondary: oklch(0.65 0.18 85);
+  --color-secondary-content: oklch(0.15 0.05 85);
+
+  --color-accent: oklch(0.72 0.15 50);
+  --color-accent-content: oklch(0.15 0.04 50);
+
+  --color-base-100: oklch(0.98 0.005 148);
+  --color-base-200: oklch(0.94 0.01 148);
+  --color-base-300: oklch(0.88 0.015 148);
+  --color-base-content: oklch(0.22 0.04 148);
+
+  --color-success: oklch(0.55 0.19 148.35);
+  --color-warning: oklch(0.78 0.18 75);
+  --color-error: oklch(0.58 0.22 25);
+  --color-info: oklch(0.60 0.14 230);
+
+  --radius-box: 0.75rem;
+  --radius-btn: 0.5rem;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
