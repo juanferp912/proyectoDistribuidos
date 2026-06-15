@@ -26,7 +26,7 @@ services:
     environment:
       - N8N_PORT=5678
       - GENERIC_TIMEZONE=America/Guayaquil
-      - N8N_ENCRYPTION_KEY=${N8N_KEY}
+      - N8N_ENCRYPTION_KEY=${N8N_KEY:-proyectodistribuidos2026}
     volumes:
       - ./n8n_data:/home/node/.n8n
     networks:

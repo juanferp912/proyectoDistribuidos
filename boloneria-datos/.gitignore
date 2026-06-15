@@ -1,0 +1,14 @@
+# Ignorar archivo de credenciales locales
+.env
+
+# Ignorar carpetas de datos locales si se generan
+.n8n/
+pgdata/
+*.log
+
+# Evitar archivos temporales y de logs de n8n_data
+n8n_data/*.sqlite-shm
+n8n_data/*.sqlite-wal
+n8n_data/crash.journal
+n8n_data/**/*.log
+n8n_data/*.log
